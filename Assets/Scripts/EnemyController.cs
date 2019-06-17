@@ -6,6 +6,10 @@ public class EnemyController : MonoBehaviour
 {
     //Player obeject
     private GameObject player;
+    //Enemy Rigidbody
+    private Rigidbody rb;
+
+    Vector2 velocity;
 
     //Movement speed of the enemy
     public float speed = 0.2f;
@@ -15,6 +19,8 @@ public class EnemyController : MonoBehaviour
     {
         //Get a reference to the player through the player tag
         player = GameObject.FindGameObjectWithTag("Player");
+        //Get a reference to the enemies rigidbody
+        rb = this.GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
@@ -28,7 +34,9 @@ public class EnemyController : MonoBehaviour
         this.transform.LookAt(player.transform);
 
         //Stop the enemy from getting too close to the player 
-        if(distanceToPlayer > 3)
-            this.transform.Translate(Vector3.forward * speed);
+        if (distanceToPlayer > 6)
+            rb.velocity = Vector2.SmoothDamp(rb.velocity, transform.forward * speed, ref velocity, 0.4f);
+        else
+            rb.velocity = Vector2.SmoothDamp(rb.velocity, Vector2.zero, ref velocity, 0.1f);
     }
 }
