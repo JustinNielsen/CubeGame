@@ -8,6 +8,8 @@ public class Controller : MonoBehaviour
     public float speed;
     public FloatingJoystick moveJoystick;
     public FloatingJoystick lookJoystick;
+    public GameObject bulletPrefab;
+    public GameObject bulletSpawner;
 
     [SerializeField]
     float movementSmoothing;
@@ -18,6 +20,9 @@ public class Controller : MonoBehaviour
     Vector3 movement;
     Vector2 velocity;
     Vector3 dir;
+    bool shooting;
+    float shootingRate;
+    float bulletTime;
 
     // Start is called before the first frame update
     void Start()
@@ -25,6 +30,10 @@ public class Controller : MonoBehaviour
         rb = this.GetComponent<Rigidbody>();
         movement = Vector3.zero;
         dir = Vector3.zero;
+        shooting = false;
+        shootingRate = 1;
+        bulletTime = 0.5f;
+        InvokeRepeating("Shoot", 0, shootingRate);
     }
 
     // Update is called once per frame
@@ -34,6 +43,14 @@ public class Controller : MonoBehaviour
         horizontal = moveJoystick.Horizontal;
         vertical = moveJoystick.Vertical;
         
+        if(lookJoystick.Horizontal != 0 || lookJoystick.Vertical != 0 && !shooting)
+        {
+            shooting = true;
+        }
+        else if(lookJoystick.Horizontal == 0 && lookJoystick.Vertical == 0 && shooting)
+        {
+            shooting = false;
+        }
     }
 
     private void FixedUpdate()
@@ -59,5 +76,14 @@ public class Controller : MonoBehaviour
 
         float heading = Mathf.Atan2(dir.x, dir.y) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, 0f, -heading);
+    }
+
+    private void Shoot()
+    {
+        if (shooting)
+        {
+            GameObject bullet = Instantiate(bulletPrefab, bulletSpawner.transform.position, bulletSpawner.transform.rotation);
+            Destroy(bullet, bulletTime);
+        }
     }
 }
